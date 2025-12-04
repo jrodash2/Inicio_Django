@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi Perfil | Portal Usuarios{% endblock title %}
+
+{% block content %}
+<div class="row g-4 align-items-start">
+  <div class="col-md-4">
+    <div class="card portal-card">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          {% if perfil.imagen %}
+          <img
+            src="{{ perfil.imagen.url }}"
+            class="rounded-circle img-fluid shadow"
+            alt="Foto de perfil"
+            style="width: 140px; height: 140px; object-fit: cover"
+          />
+          {% else %}
+          <img
+            src="https://avatars.githubusercontent.com/u/583231?v=4"
+            class="rounded-circle img-fluid shadow"
+            alt="Avatar por defecto"
+            style="width: 140px; height: 140px; object-fit: cover"
+          />
+          {% endif %}
+        </div>
+        <h5 class="card-title mb-0">{{ request.user.get_full_name|default:request.user.username }}</h5>
+        <p class="text-muted">{{ request.user.email }}</p>
+        <span class="badge text-bg-primary">Perfil actualizado</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card portal-card">
+      <div class="card-body p-4">
+        <h4 class="fw-semibold mb-3">Actualizar perfil</h4>
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+          {% csrf_token %}
+          <div class="col-md-6">
+            <label class="form-label" for="id_first_name">Nombre</label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="id_last_name">Apellido</label>
+            {{ form.last_name }}
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="id_imagen">Foto de perfil</label>
+            {{ form.imagen }}
+            {% if form.imagen.errors %}
+            <div class="text-danger small">{{ form.imagen.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-portal px-4">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
