@@ -1,10 +1,12 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 
 from .forms import PerfilUsuarioForm, UsuarioCrearForm, UsuarioEdicionForm
 from .models import PerfilUsuario
@@ -39,14 +41,30 @@ class LogoutView(auth_views.LogoutView):
     next_page = "login"
 
 
-@login_required
-def inicio(request):
-    nombre_usuario = request.user.get_full_name() or request.user.username
-    contexto = {
-        "titulo": "Inicio",
-        "saludo": f"Hola, {nombre_usuario}!",
-    }
-    return render(request, "inicio.html", contexto)
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "inicio.html"
+    login_url = reverse_lazy("login")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        nombre_usuario = self.request.user.get_full_name() or self.request.user.username
+
+        context.update(
+            {
+                "titulo": "Inicio",
+                "saludo": f"Hola, {nombre_usuario}!",
+                "usuarios_totales": User.objects.count(),
+                "usuarios_activos": User.objects.filter(is_active=True).count(),
+                "usuarios_inactivos": User.objects.filter(is_active=False).count(),
+                "administradores": User.objects.filter(
+                    groups__name="administrador"
+                ).distinct().count(),
+                "gestores": User.objects.filter(groups__name="gestor").distinct().count(),
+                "tiene_permiso": self.request.user.is_superuser
+                or _usuario_en_roles(self.request.user, ["administrador", "gestor"]),
+            }
+        )
+        return context
 
 
 @login_required
@@ -166,15 +184,3 @@ def usuario_eliminar(request, pk):
     }
     return render(request, "cuentas/usuarios/confirmar_eliminacion.html", contexto)
 
-@login_required
-def inicio(request):
-    # Comprobamos si el usuario es superusuario o pertenece a los grupos 'administrador' o 'gestor'
-    tiene_permiso = request.user.is_superuser or request.user.groups.filter(name__in=['administrador', 'gestor']).exists()
-    
-    contexto = {
-        "titulo": "Inicio",
-        "saludo": f"Hola, {request.user.get_full_name() or request.user.username}!",
-        "tiene_permiso": tiene_permiso  # Pasamos esta variable al contexto
-    }
-    
-    return render(request, "inicio.html", contexto)
