@@ -10,10 +10,49 @@
           <p class="text-muted mb-2">Bienvenido de vuelta</p>
           <h1 class="h3 fw-bold mb-3">{{ saludo }}</h1>
           <p class="mb-4">Este es el panel inicial del portal. Desde aquí podrás acceder a la administración de usuarios y a tu perfil personal.</p>
-          <div class="d-flex gap-2">
-            <a class="btn btn-portal" href="#">Ir a usuarios</a>
-            <a class="btn btn-outline-primary" href="#">Ver mi perfil</a>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-portal" href="{% url 'inicio' %}">Empezar</a>
+            {% if tiene_permiso %}
+            <a class="btn btn-outline-primary" href="{% url 'usuarios_lista' %}">Administrar usuarios</a>
+            {% endif %}
+            <a class="btn btn-outline-primary" href="{% url 'perfil' %}">Ver mi perfil</a>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+      <div class="card portal-card h-100">
+        <div class="card-body">
+          <p class="text-muted mb-1">Usuarios totales</p>
+          <h2 class="fw-bold mb-0">{{ usuarios_totales }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card portal-card h-100">
+        <div class="card-body">
+          <p class="text-muted mb-1">Usuarios activos</p>
+          <h2 class="fw-bold mb-0">{{ usuarios_activos }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card portal-card h-100">
+        <div class="card-body">
+          <p class="text-muted mb-1">Usuarios inactivos</p>
+          <h2 class="fw-bold mb-0">{{ usuarios_inactivos }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card portal-card h-100">
+        <div class="card-body">
+          <p class="text-muted mb-1">Administradores</p>
+          <h2 class="fw-bold mb-0">{{ administradores }}</h2>
+          <span class="text-muted">Gestores: {{ gestores }}</span>
         </div>
       </div>
     </div>
