@@ -165,3 +165,16 @@ def usuario_eliminar(request, pk):
         "usuario_objetivo": usuario_objetivo,
     }
     return render(request, "cuentas/usuarios/confirmar_eliminacion.html", contexto)
+
+@login_required
+def inicio(request):
+    # Comprobamos si el usuario es superusuario o pertenece a los grupos 'administrador' o 'gestor'
+    tiene_permiso = request.user.is_superuser or request.user.groups.filter(name__in=['administrador', 'gestor']).exists()
+    
+    contexto = {
+        "titulo": "Inicio",
+        "saludo": f"Hola, {request.user.get_full_name() or request.user.username}!",
+        "tiene_permiso": tiene_permiso  # Pasamos esta variable al contexto
+    }
+    
+    return render(request, "inicio.html", contexto)

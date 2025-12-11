@@ -81,11 +81,14 @@
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="{% url 'inicio' %}">Inicio</a>
             </li>
-            {% if request.user.is_authenticated and (request.user.is_superuser or request.user.groups.filter(name__in=['administrador','gestor']).exists()) %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'usuarios_lista' %}">Administrar usuarios</a>
-            </li>
-            {% endif %}
+          {% if request.user.is_authenticated %}
+    {% if tiene_permiso %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'usuarios_lista' %}">Administrar usuarios</a>
+        </li>
+    {% endif %}
+{% endif %}
+
             {% if request.user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
